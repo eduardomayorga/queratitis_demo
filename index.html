@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Caso: Queratitis</title>
+<style>
+:root { color-scheme: light; }
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: #1a1a1a;
+  background: #ffffff;
+  line-height: 1.5;
+  font-size: 15px;
+}
+.container { max-width: 780px; margin: 0 auto; padding: 16px; }
+header {
+  border-bottom: 1px solid #e6e6e6;
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+}
+header h1 { margin: 0 0 4px 0; font-size: 22px; color: #1F4E79; font-weight: 700; }
+header .sub { color: #707070; font-size: 13px; }
+header .meta { color: #707070; font-size: 12px; margin-top: 4px; }
+
+.phases {
+  display: flex;
+  gap: 4px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+.phase {
+  flex: 1;
+  min-width: 90px;
+  padding: 6px 8px;
+  background: #f2f2f2;
+  border-radius: 4px;
+  font-size: 11px;
+  color: #707070;
+  text-align: center;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  font-weight: 600;
+}
+.phase.active { background: #1F4E79; color: white; }
+.phase.done { background: #2E74B5; color: white; opacity: 0.7; }
+
+h2 { color: #1F4E79; font-size: 18px; margin: 20px 0 10px 0; font-weight: 600; }
+h3 { color: #2E74B5; font-size: 15px; margin: 16px 0 8px 0; font-weight: 600; }
+p { margin: 8px 0; }
+.muted { color: #707070; font-size: 13px; }
+
+.callout {
+  background: #EAF1F8;
+  border-left: 4px solid #2E74B5;
+  padding: 12px 14px;
+  margin: 12px 0;
+  border-radius: 0 4px 4px 0;
+  font-size: 14px;
+}
+.callout.warn {
+  background: #FDF4E6;
+  border-left-color: #D88500;
+}
+.callout strong { color: #1F4E79; }
+
+button {
+  font-family: inherit;
+  font-size: 14px;
+  padding: 9px 16px;
+  border-radius: 6px;
+  border: 1px solid #1F4E79;
+  background: #1F4E79;
+  color: white;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.15s;
+}
+button:hover { background: #163C5E; }
+button:disabled { background: #c0c0c0; border-color: #c0c0c0; cursor: not-allowed; }
+button.secondary {
+  background: white;
+  color: #1F4E79;
+}
+button.secondary:hover { background: #f0f6fa; }
+button.exam-item {
+  width: 100%;
+  text-align: left;
+  background: white;
+  color: #1F4E79;
+  border: 1px solid #BFD4E6;
+  margin-bottom: 6px;
+  padding: 10px 14px;
+  font-weight: 500;
+}
+button.exam-item:hover { background: #f0f6fa; }
+button.exam-item.chosen {
+  background: #EAF1F8;
+  border-color: #2E74B5;
+}
+
+.exam-item-content { display: flex; justify-content: space-between; align-items: center; }
+.exam-finding {
+  background: #f8f8f8;
+  border-radius: 0 0 6px 6px;
+  padding: 10px 14px;
+  margin-top: -7px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #333;
+  border: 1px solid #e6e6e6;
+  border-top: none;
+}
+
+textarea, input[type="text"] {
+  width: 100%;
+  font-family: inherit;
+  font-size: 14px;
+  padding: 9px 12px;
+  border: 1px solid #c0c0c0;
+  border-radius: 6px;
+  resize: vertical;
+}
+textarea:focus, input:focus { outline: none; border-color: #2E74B5; }
+
+.chat {
+  border: 1px solid #e6e6e6;
+  border-radius: 8px;
+  background: #fafafa;
+  padding: 12px;
+  max-height: 420px;
+  overflow-y: auto;
+  margin-bottom: 12px;
+}
+.chat-empty { color: #909090; font-style: italic; text-align: center; padding: 20px; }
+.msg { margin: 8px 0; }
+.msg.user { text-align: right; }
+.msg .bubble {
+  display: inline-block;
+  max-width: 80%;
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  text-align: left;
+}
+.msg.user .bubble { background: #1F4E79; color: white; border-bottom-right-radius: 4px; }
+.msg.patient .bubble { background: white; color: #1a1a1a; border: 1px solid #e0e0e0; border-bottom-left-radius: 4px; }
+.msg .who { font-size: 11px; color: #707070; margin-bottom: 2px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.3px; }
+.msg.user .who { text-align: right; }
+
+.chat-input { display: flex; gap: 8px; }
+.chat-input input { flex: 1; }
+
+.actions { margin-top: 20px; display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+
+.choice-list label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 9px 12px;
+  border: 1px solid #d0d0d0;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  background: white;
+}
+.choice-list label:hover { background: #f8f8f8; }
+.choice-list label input { margin-top: 3px; }
+.choice-list label.selected { background: #EAF1F8; border-color: #2E74B5; }
+
+.field { margin-bottom: 16px; }
+.field label.title { display: block; font-weight: 600; margin-bottom: 6px; color: #1F4E79; }
+
+.rubric-item {
+  border: 1px solid #e6e6e6;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  display: flex;
+  gap: 12px;
+}
+.rubric-flag {
+  font-size: 22px;
+  font-weight: 700;
+  width: 30px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.rubric-flag.ok { color: #2E8B57; }
+.rubric-flag.partial { color: #D88500; }
+.rubric-flag.fail { color: #C00000; }
+.rubric-name { font-weight: 600; color: #1F4E79; margin-bottom: 4px; }
+.rubric-comment { font-size: 14px; color: #333; }
+
+.summary-section {
+  background: #f8f8f8;
+  border-radius: 8px;
+  padding: 14px;
+  margin: 12px 0;
+}
+.summary-section h3 { margin-top: 0; }
+.summary-section ul { margin: 6px 0; padding-left: 20px; }
+.summary-section li { margin: 4px 0; }
+
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #c0c0c0;
+  border-top-color: #1F4E79;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading { color: #707070; font-style: italic; padding: 12px; }
+
+.transcript-block {
+  background: #f8f8f8;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin: 8px 0;
+  font-size: 13px;
+}
+.transcript-block .who { font-weight: 600; color: #1F4E79; }
+.transcript-block .what { color: #333; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Caso clínico: Queratitis</h1>
+    <div class="sub">Prototipo v1 · Encuentro con paciente simulado por IA · Mapa de Competencias para el Médico General</div>
+    <div class="meta">Anclado en el Core Components Framework (Van Melle et al., 2019)</div>
+    <div class="phases" id="phases">
+      <div class="phase active" data-phase="intro">1. Caso</div>
+      <div class="phase" data-phase="anamnesis">2. Anamnesis</div>
+      <div class="phase" data-phase="exam">3. Examen</div>
+      <div class="phase" data-phase="diagnosis">4. Diagnóstico</div>
+      <div class="phase" data-phase="management">5. Conducta</div>
+      <div class="phase" data-phase="feedback">6. Feedback</div>
+    </div>
+  </header>
+  <main id="content"></main>
+</div>
+
+<script>
+// ============================================================
+// GROUND TRUTH — el paciente y su historia oculta
+// ============================================================
+const PATIENT_SYSTEM = `Sos Carlos Méndez, 38 años, ejecutivo de ventas. Estás en consulta con tu médico general.
+
+Motivo de consulta: ojo derecho rojo desde hace 3 días, te molesta bastante.
+
+TU HISTORIA COMPLETA (no la reveles toda de entrada; respondé sólo lo que te pregunten):
+- Empezó hace 3 días, gradualmente, en el ojo derecho.
+- Dolor moderado en el ojo derecho, no severo, pero molesto.
+- Fotofobia importante (la luz te molesta).
+- Sensación de que tenés algo adentro del ojo.
+- Lagrimeo constante del ojo afectado.
+- Visión un poco borrosa en ese ojo.
+- NO tenés secreción amarilla o pus.
+- Tuviste dos episodios similares en los últimos dos años. El último hace unos ocho meses, el primero hace dos años.
+- En los episodios anteriores, te dijeron "una infección por un virus" pero no te acordás bien y se te pasó con unas gotas.
+- Tenés un fuego (herpes labial) en el labio inferior, desde hace una semana. (Si te preguntan por la piel o por fuegos/herpes, lo mencionás.)
+- La semana pasada tuviste un viaje de trabajo intenso, dormiste poco, mucho estrés y mucho sol.
+- NUNCA usaste lentes de contacto.
+- Sin enfermedades importantes (diabetes, hipertensión, etc.). Sin alergias conocidas.
+- Tu esposa te dio unas lágrimas artificiales que ella usa para el ojo seco; te aplicaste pero no notaste mejoría.
+- No fumás. Tomás alcohol ocasionalmente.
+
+CÓMO RESPONDER:
+- Hablá como un paciente real, no como un libro de medicina. Español neutro, no porteño.
+- Respuestas cortas (1 a 3 oraciones generalmente, máximo 5).
+- Sólo decí lo que te preguntan. No ofrezcas información de más.
+- Si te preguntan abiertamente "qué le pasa" o "cuénteme qué siente", contá brevemente: dolor en el ojo derecho, mucha molestia con la luz, lagrimeo, visión un poco borrosa, hace 3 días.
+- Si te preguntan algo que no está en tu historia, decí "no sé" o "no me acuerdo".
+- No diagnostiques ni sugieras nada al médico.
+- Sé un poco preocupado pero no histérico.
+- Si el médico te pregunta cosas técnicas que no entendés, pedile que te explique con palabras simples.`;
+
+const EXAM_ITEMS = [
+  { id: 'av', name: 'Agudeza visual (Snellen) con y sin agujero estenopeico',
+    finding: 'OD: 20/40, no mejora significativamente con estenopeico. OS: 20/20.' },
+  { id: 'ext', name: 'Inspección externa: párpados, conjuntiva, córnea a simple vista',
+    finding: 'Hiperemia conjuntival difusa en OD. Párpados sin alteraciones. Córnea con una opacidad sutil en la zona central, difícil de ver sin tinción.' },
+  { id: 'evp', name: 'Eversión del párpado superior, búsqueda de cuerpo extraño',
+    finding: 'Sin cuerpos extraños. Conjuntiva tarsal sin alteraciones.' },
+  { id: 'pup', name: 'Examen pupilar: reactividad y prueba de la linterna oscilante (DPAR)',
+    finding: 'Pupilas isocóricas y reactivas a la luz. Sin DPAR.' },
+  { id: 'cvf', name: 'Campo visual por confrontación',
+    finding: 'Normal en ambos ojos.' },
+  { id: 'flu', name: 'Tinción con fluoresceína (con luz azul de cobalto)',
+    finding: '★ HALLAZGO CLAVE: úlcera dendrítica típica en el centro de la córnea del OD, con bulbos terminales en los extremos de las ramas. Patrón ramificado característico.', key: true },
+  { id: 'vh', name: 'Estimación de la profundidad de la cámara anterior (van Herick / iluminación oblicua)',
+    finding: 'Cámara anterior de profundidad normal en ambos ojos.' },
+  { id: 'pio', name: 'Estimación de la presión intraocular por palpación bidigital',
+    finding: 'Presión normal, similar al ojo izquierdo. Sin hallazgos de hipertensión ocular.' },
+  { id: 'sens', name: 'Sensibilidad corneal (test con torunda de algodón)',
+    finding: '★ HALLAZGO CLAVE: sensibilidad corneal REDUCIDA en OD comparada con OS. (En queratitis herpética epitelial es típico.)', key: true },
+  { id: 'piel', name: 'Examen de piel y mucosas de cara y labios',
+    finding: '★ HALLAZGO CLAVE: vesículas costrosas en el labio inferior, compatibles con herpes labial activo de unos días de evolución.', key: true },
+  { id: 'fondo', name: 'Oftalmoscopia directa (fondo de ojo)',
+    finding: 'Sin alteraciones evidentes en ambos ojos. Papila, mácula y vasos sin particularidades.' }
+];
+
+// ============================================================
+// ESTADO
+// ============================================================
+const state = {
+  phase: 'intro',
+  anamnesis: [],
+  examChosen: {}, // {id: true}
+  diagnosis: { principal: '', justificacion: '', alternativos: '' },
+  management: { urgencia: '', tratamientos: [], mensaje: '', razonamiento: '' },
+  feedback: null,
+  loading: false
+};
+
+const PHASES = ['intro', 'anamnesis', 'exam', 'diagnosis', 'management', 'feedback'];
+
+// ============================================================
+// RENDERIZADO POR FASE
+// ============================================================
+function render() {
+  updatePhaseIndicator();
+  const content = document.getElementById('content');
+  content.innerHTML = '';
+  if (state.phase === 'intro') renderIntro(content);
+  else if (state.phase === 'anamnesis') renderAnamnesis(content);
+  else if (state.phase === 'exam') renderExam(content);
+  else if (state.phase === 'diagnosis') renderDiagnosis(content);
+  else if (state.phase === 'management') renderManagement(content);
+  else if (state.phase === 'feedback') renderFeedback(content);
+}
+
+function updatePhaseIndicator() {
+  const phasesEl = document.getElementById('phases');
+  const idx = PHASES.indexOf(state.phase);
+  Array.from(phasesEl.children).forEach((el, i) => {
+    el.classList.remove('active', 'done');
+    if (i < idx) el.classList.add('done');
+    else if (i === idx) el.classList.add('active');
+  });
+}
+
+// ---------------- FASE 1: INTRO ----------------
+function renderIntro(c) {
+  c.innerHTML = `
+    <h2>Contexto del encuentro</h2>
+    <p>Sos el <strong>médico general</strong> que atiende a Carlos Méndez en un centro de salud de atención primaria. Llega a tu consulta sin turno previo.</p>
+    <div class="callout">
+      <strong>Carlos Méndez</strong> · 38 años · ejecutivo de ventas<br>
+      <em>"Doctor, vengo porque tengo el ojo derecho rojo desde hace tres días y me molesta bastante."</em>
+    </div>
+    <h3>Lo que se espera de vos</h3>
+    <p>Vas a recorrer cuatro fases — anamnesis, examen físico, diagnóstico, conducta — como en una consulta real. Al final recibís un feedback estructurado contra una rúbrica derivada del Mapa de Competencias para el Médico General.</p>
+    <p class="muted">Tomate el tiempo que necesites. Las preguntas que hagas, los exámenes que pidas y las decisiones que tomes (y las que no tomes) son material de evaluación.</p>
+    <div class="actions">
+      <button onclick="advance()">Empezar la consulta →</button>
+    </div>
+  `;
+}
+
+// ---------------- FASE 2: ANAMNESIS ----------------
+function renderAnamnesis(c) {
+  c.innerHTML = `
+    <h2>Anamnesis</h2>
+    <p class="muted">Conversá con el paciente. Hacé las preguntas que consideres relevantes. Cuando sientas que tenés suficiente información, pasá a la fase de examen físico.</p>
+    <div class="chat" id="chat"></div>
+    <div class="chat-input">
+      <input type="text" id="chat-input-field" placeholder="Escribí tu pregunta y presioná Enter…" onkeydown="if(event.key==='Enter') sendAnamnesisMessage()">
+      <button id="send-btn" onclick="sendAnamnesisMessage()">Enviar</button>
+    </div>
+    <div class="actions">
+      <button class="secondary" onclick="advance()">Tengo suficiente información →</button>
+    </div>
+  `;
+  renderChat();
+  document.getElementById('chat-input-field').focus();
+}
+
+function renderChat() {
+  const chat = document.getElementById('chat');
+  if (!chat) return;
+  if (state.anamnesis.length === 0) {
+    chat.innerHTML = '<div class="chat-empty">El paciente está esperando. Hacé tu primera pregunta abajo.</div>';
+    return;
+  }
+  chat.innerHTML = state.anamnesis.map(m => `
+    <div class="msg ${m.role}">
+      <div class="who">${m.role === 'user' ? 'Vos' : 'Carlos'}</div>
+      <div class="bubble">${escapeHtml(m.text)}</div>
+    </div>
+  `).join('');
+  chat.scrollTop = chat.scrollHeight;
+}
+
+async function sendAnamnesisMessage() {
+  const input = document.getElementById('chat-input-field');
+  const text = input.value.trim();
+  if (!text || state.loading) return;
+  state.anamnesis.push({ role: 'user', text });
+  input.value = '';
+  state.loading = true;
+  document.getElementById('send-btn').disabled = true;
+  renderChat();
+
+  // Mostrar placeholder de "escribiendo…"
+  const chat = document.getElementById('chat');
+  chat.innerHTML += '<div class="msg patient" id="typing"><div class="who">Carlos</div><div class="bubble"><span class="spinner"></span>pensando…</div></div>';
+  chat.scrollTop = chat.scrollHeight;
+
+  try {
+    const history = state.anamnesis.map(m => `${m.role === 'user' ? 'Médico' : 'Carlos'}: ${m.text}`).join('\n');
+    const prompt = `${PATIENT_SYSTEM}\n\n--- HISTORIAL DEL ENCUENTRO HASTA AHORA ---\n${history}\n\nÚltimo mensaje del médico: "${text}"\n\nRespondé como Carlos al médico. Sólo tu respuesta, sin meta-comentario ni etiquetas.`;
+    const reply = await callClaude(prompt);
+    const cleanReply = extractText(reply).trim().replace(/^Carlos:\s*/i, '');
+    state.anamnesis.push({ role: 'patient', text: cleanReply || '(...)' });
+  } catch (e) {
+    state.anamnesis.push({ role: 'patient', text: '(Error: ' + (e.message || 'no se pudo obtener respuesta') + ')' });
+  }
+  state.loading = false;
+  document.getElementById('send-btn').disabled = false;
+  renderChat();
+  document.getElementById('chat-input-field').focus();
+}
+
+// ---------------- FASE 3: EXAMEN FÍSICO ----------------
+function renderExam(c) {
+  c.innerHTML = `
+    <h2>Examen físico</h2>
+    <p class="muted">Elegí las maniobras de examen que querés realizar. Cada selección revela el hallazgo. <strong>Lo que NO elijas también cuenta</strong> para la evaluación, así que considerá qué necesitás y qué no.</p>
+    <div id="exam-list"></div>
+    <div class="actions">
+      <button onclick="advance()">Continuar al diagnóstico →</button>
+    </div>
+  `;
+  renderExamList();
+}
+
+function renderExamList() {
+  const list = document.getElementById('exam-list');
+  list.innerHTML = EXAM_ITEMS.map(item => {
+    const chosen = state.examChosen[item.id];
+    return `
+      <button class="exam-item ${chosen ? 'chosen' : ''}" onclick="chooseExam('${item.id}')">
+        <div class="exam-item-content">
+          <span>${item.name}</span>
+          <span style="color: #707070; font-size: 12px;">${chosen ? '✓ realizado' : 'click para realizar'}</span>
+        </div>
+      </button>
+      ${chosen ? `<div class="exam-finding">${escapeHtml(item.finding)}</div>` : ''}
+    `;
+  }).join('');
+}
+
+function chooseExam(id) {
+  state.examChosen[id] = true;
+  renderExamList();
+}
+
+// ---------------- FASE 4: DIAGNÓSTICO ----------------
+function renderDiagnosis(c) {
+  c.innerHTML = `
+    <h2>Diagnóstico diferencial</h2>
+    <p class="muted">A partir de la anamnesis y el examen físico, formulá tu razonamiento diagnóstico.</p>
+    <div class="field">
+      <label class="title">Diagnóstico más probable</label>
+      <input type="text" id="dx-principal" placeholder="Ej: queratitis bacteriana, conjuntivitis viral, etc." value="${escapeHtml(state.diagnosis.principal)}">
+    </div>
+    <div class="field">
+      <label class="title">Justificación clínica (breve)</label>
+      <textarea id="dx-just" rows="4" placeholder="¿Qué hallazgos de la anamnesis y del examen apoyan tu diagnóstico?">${escapeHtml(state.diagnosis.justificacion)}</textarea>
+    </div>
+    <div class="field">
+      <label class="title">Diagnósticos alternativos a considerar o descartar</label>
+      <textarea id="dx-alt" rows="3" placeholder="Listá otros diagnósticos que considerás en el diferencial.">${escapeHtml(state.diagnosis.alternativos)}</textarea>
+    </div>
+    <div class="actions">
+      <button onclick="saveDiagnosis()">Continuar a la conducta →</button>
+    </div>
+  `;
+}
+
+function saveDiagnosis() {
+  state.diagnosis.principal = document.getElementById('dx-principal').value.trim();
+  state.diagnosis.justificacion = document.getElementById('dx-just').value.trim();
+  state.diagnosis.alternativos = document.getElementById('dx-alt').value.trim();
+  if (!state.diagnosis.principal) {
+    alert('Por favor proponé al menos un diagnóstico más probable.');
+    return;
+  }
+  advance();
+}
+
+// ---------------- FASE 5: CONDUCTA ----------------
+function renderManagement(c) {
+  const urgencias = [
+    { v: 'misma-hora', l: 'Misma hora / derivación a urgencias hospitalarias' },
+    { v: 'mismo-dia', l: 'Mismo día a oftalmología' },
+    { v: 'misma-semana', l: 'Misma semana a oftalmología' },
+    { v: 'rutinaria', l: 'Derivación rutinaria a oftalmología' },
+    { v: 'primaria', l: 'Manejo solo en atención primaria, sin derivación' }
+  ];
+  const tratamientos = [
+    { v: 'corticoide', l: 'Corticoide tópico (p. ej., prednisolona, dexametasona)' },
+    { v: 'antibiotico', l: 'Antibiótico tópico empírico' },
+    { v: 'antiviral', l: 'Antiviral tópico (p. ej., aciclovir oftálmico)' },
+    { v: 'lubricante', l: 'Lágrima artificial / lubricante' },
+    { v: 'analgesia', l: 'Analgesia oral' },
+    { v: 'parche', l: 'Parche oclusivo en el ojo afectado' },
+    { v: 'nada', l: 'No iniciar nada hasta la evaluación oftalmológica' }
+  ];
+
+  c.innerHTML = `
+    <h2>Conducta</h2>
+    <div class="field">
+      <label class="title">Urgencia de derivación</label>
+      <div class="choice-list" id="urg-list">
+        ${urgencias.map(u => `
+          <label class="${state.management.urgencia === u.v ? 'selected' : ''}">
+            <input type="radio" name="urg" value="${u.v}" ${state.management.urgencia === u.v ? 'checked' : ''} onchange="state.management.urgencia=this.value; renderManagement(document.getElementById('content'));">
+            <span>${u.l}</span>
+          </label>
+        `).join('')}
+      </div>
+    </div>
+    <div class="field">
+      <label class="title">Tratamiento(s) a iniciar en atención primaria (podés elegir varios)</label>
+      <div class="choice-list" id="tx-list">
+        ${tratamientos.map(t => `
+          <label class="${state.management.tratamientos.includes(t.v) ? 'selected' : ''}">
+            <input type="checkbox" value="${t.v}" ${state.management.tratamientos.includes(t.v) ? 'checked' : ''} onchange="toggleTreatment('${t.v}', this.checked)">
+            <span>${t.l}</span>
+          </label>
+        `).join('')}
+      </div>
+    </div>
+    <div class="field">
+      <label class="title">¿Qué le explicás al paciente sobre su cuadro? (breve)</label>
+      <textarea id="mgmt-mensaje" rows="3" placeholder="Qué le decís sobre el diagnóstico, la conducta y los signos de alarma.">${escapeHtml(state.management.mensaje)}</textarea>
+    </div>
+    <div class="field">
+      <label class="title">Razonamiento clínico de tu conducta (breve)</label>
+      <textarea id="mgmt-razon" rows="3" placeholder="Por qué decidiste esta urgencia y este tratamiento.">${escapeHtml(state.management.razonamiento)}</textarea>
+    </div>
+    <div class="actions">
+      <button onclick="submitForFeedback()">Cerrar consulta y recibir feedback →</button>
+    </div>
+  `;
+}
+
+function toggleTreatment(v, checked) {
+  if (checked) {
+    if (!state.management.tratamientos.includes(v)) state.management.tratamientos.push(v);
+  } else {
+    state.management.tratamientos = state.management.tratamientos.filter(x => x !== v);
+  }
+  renderManagement(document.getElementById('content'));
+}
+
+function submitForFeedback() {
+  state.management.mensaje = document.getElementById('mgmt-mensaje').value.trim();
+  state.management.razonamiento = document.getElementById('mgmt-razon').value.trim();
+  if (!state.management.urgencia) {
+    alert('Por favor elegí un nivel de urgencia de derivación.');
+    return;
+  }
+  state.phase = 'feedback';
+  state.feedback = null;
+  render();
+  generateFeedback();
+}
+
+// ---------------- FASE 6: FEEDBACK ----------------
+function renderFeedback(c) {
+  if (state.loading || !state.feedback) {
+    c.innerHTML = `
+      <h2>Generando feedback…</h2>
+      <p class="loading"><span class="spinner"></span>El evaluador docente está revisando tu desempeño contra la rúbrica del Mapa de Competencias. Esto puede tardar 15–30 segundos.</p>
+    `;
+    return;
+  }
+  if (state.feedback.error) {
+    c.innerHTML = `
+      <h2>Error generando el feedback</h2>
+      <div class="callout warn">${escapeHtml(state.feedback.error)}</div>
+      <div class="actions">
+        <button onclick="generateFeedback()">Reintentar</button>
+        <button class="secondary" onclick="restart()">Reiniciar caso</button>
+      </div>
+    `;
+    return;
+  }
+
+  const fb = state.feedback;
+  const flagClass = (f) => f === '✓' ? 'ok' : (f === '⚠' ? 'partial' : 'fail');
+
+  c.innerHTML = `
+    <h2>Feedback del encuentro</h2>
+    ${fb.veredicto_global ? `<div class="callout"><strong>Resumen:</strong> ${escapeHtml(fb.veredicto_global)}</div>` : ''}
+    <h3>Evaluación por criterio</h3>
+    ${(fb.criterios || []).map(cr => `
+      <div class="rubric-item">
+        <div class="rubric-flag ${flagClass(cr.cumple)}">${cr.cumple || '?'}</div>
+        <div>
+          <div class="rubric-name">${escapeHtml(cr.nombre)}</div>
+          <div class="rubric-comment">${escapeHtml(cr.comentario || '')}</div>
+        </div>
+      </div>
+    `).join('')}
+    ${fb.fortalezas && fb.fortalezas.length ? `
+      <div class="summary-section">
+        <h3 style="color: #2E8B57;">Fortalezas</h3>
+        <ul>${fb.fortalezas.map(f => `<li>${escapeHtml(f)}</li>`).join('')}</ul>
+      </div>
+    ` : ''}
+    ${fb.mejoras && fb.mejoras.length ? `
+      <div class="summary-section">
+        <h3 style="color: #D88500;">Oportunidades de mejora</h3>
+        <ul>${fb.mejoras.map(f => `<li>${escapeHtml(f)}</li>`).join('')}</ul>
+      </div>
+    ` : ''}
+    ${fb.pregunta_socratica ? `
+      <div class="callout">
+        <strong>Pregunta para reflexionar:</strong><br>
+        ${escapeHtml(fb.pregunta_socratica)}
+      </div>
+    ` : ''}
+
+    <h3>Tu desempeño completo (referencia)</h3>
+    <div class="summary-section">
+      <strong>Anamnesis (${state.anamnesis.filter(m=>m.role==='user').length} preguntas):</strong>
+      ${state.anamnesis.map(m => `<div class="transcript-block"><span class="who">${m.role==='user'?'Vos':'Carlos'}:</span> <span class="what">${escapeHtml(m.text)}</span></div>`).join('')}
+    </div>
+    <div class="summary-section">
+      <strong>Exámenes realizados:</strong>
+      <ul>${Object.keys(state.examChosen).map(id => `<li>${escapeHtml(EXAM_ITEMS.find(e => e.id === id).name)}</li>`).join('') || '<li>(ninguno)</li>'}</ul>
+      <strong>Exámenes NO realizados:</strong>
+      <ul>${EXAM_ITEMS.filter(e => !state.examChosen[e.id]).map(e => `<li>${escapeHtml(e.name)}${e.key ? ' <em style="color:#C00000;">(hallazgo clave perdido)</em>' : ''}</li>`).join('')}</ul>
+    </div>
+    <div class="summary-section">
+      <strong>Diagnóstico:</strong> ${escapeHtml(state.diagnosis.principal)}<br>
+      <em>Justificación:</em> ${escapeHtml(state.diagnosis.justificacion)}<br>
+      <em>Alternativos:</em> ${escapeHtml(state.diagnosis.alternativos)}
+    </div>
+    <div class="summary-section">
+      <strong>Conducta:</strong><br>
+      Urgencia: ${escapeHtml(state.management.urgencia)}<br>
+      Tratamientos: ${state.management.tratamientos.join(', ') || '(ninguno)'}<br>
+      <em>Mensaje al paciente:</em> ${escapeHtml(state.management.mensaje)}<br>
+      <em>Razonamiento:</em> ${escapeHtml(state.management.razonamiento)}
+    </div>
+
+    <div class="actions">
+      <button class="secondary" onclick="restart()">Reiniciar el caso</button>
+    </div>
+  `;
+}
+
+async function generateFeedback() {
+  state.loading = true;
+  state.feedback = null;
+  render();
+
+  const anamnesisStr = state.anamnesis.map(m => `${m.role === 'user' ? 'Médico' : 'Carlos'}: ${m.text}`).join('\n');
+  const examDone = EXAM_ITEMS.filter(e => state.examChosen[e.id]).map(e => `- ${e.name}: ${e.finding}`).join('\n');
+  const examMissed = EXAM_ITEMS.filter(e => !state.examChosen[e.id]).map(e => `- ${e.name}${e.key ? ' [HALLAZGO CLAVE]' : ''}`).join('\n');
+
+  const evalPrompt = `Sos un evaluador docente experto en oftalmología, formado por el Dr. Eduardo Mayorga (Hospital Italiano de Buenos Aires, Ophthalmology Foundation, Pan-American Council of Professors in Ophthalmology). Evaluás el desempeño de médicos generales en formación en encuentros clínicos simulados.
+
+CASO REAL: Queratitis herpética epitelial en Carlos Méndez, 38 años, ejecutivo, con episodios oculares recurrentes y herpes labial activo. Hallazgo patognomónico: úlcera dendrítica con fluoresceína. La sensibilidad corneal está reducida (típico de herpética). El error catastrófico clásico es prescribir corticoides tópicos empíricos pensando que es bacteriana o conjuntivitis común — los corticoides aceleran la replicación viral y pueden llevar a perforación corneal y pérdida de visión permanente.
+
+DESEMPEÑO DEL APRENDIZ:
+
+--- Anamnesis ---
+${anamnesisStr || '(no realizó anamnesis)'}
+
+--- Exámenes físicos realizados ---
+${examDone || '(ninguno)'}
+
+--- Exámenes físicos NO realizados ---
+${examMissed}
+
+--- Diagnóstico propuesto ---
+Más probable: ${state.diagnosis.principal}
+Justificación: ${state.diagnosis.justificacion}
+Diferenciales: ${state.diagnosis.alternativos}
+
+--- Conducta ---
+Urgencia de derivación: ${state.management.urgencia}
+Tratamientos a iniciar: ${state.management.tratamientos.join(', ') || 'ninguno'}
+Mensaje al paciente: ${state.management.mensaje}
+Razonamiento: ${state.management.razonamiento}
+
+RÚBRICA — evaluá cada criterio con ✓ (cumple), ⚠ (parcial) o ✗ (no cumple), y un comentario breve (1–2 oraciones) en español neutro:
+
+1. Anamnesis focalizada: ¿exploró duración, lateralidad, dolor, fotofobia, agudeza visual, episodios previos, herpes labial / fuegos, uso de lentes de contacto, factores precipitantes (estrés, sol)?
+2. Examen físico apropiado: ¿incluyó agudeza visual, examen externo, examen pupilar, y crucialmente fluoresceína?
+3. Reconocimiento del hallazgo clave: ¿la úlcera dendrítica, sensibilidad corneal reducida y/o el herpes labial llevaron al diagnóstico correcto?
+4. Diagnóstico diferencial: ¿propuso queratitis herpética (o "viral") como más probable o lo incluyó? ¿descartó conjuntivitis simple y bacteriana?
+5. Decisión de derivación apropiada: ¿derivó el mismo día a oftalmología? (apropiado para queratitis con compromiso corneal)
+6. EVITA el error crítico de corticoides tópicos: ¿NO prescribió corticoides? (si los prescribió, marcar ✗ y enfatizar la gravedad del error)
+7. Comunicación con el paciente: ¿le explicó claramente y le dio signos de alarma?
+
+Respondé EXCLUSIVAMENTE con JSON válido en este formato exacto (sin texto adicional antes o después, sin bloques de código):
+{
+  "criterios": [
+    { "nombre": "Anamnesis focalizada", "cumple": "✓|⚠|✗", "comentario": "..." },
+    { "nombre": "Examen físico apropiado", "cumple": "✓|⚠|✗", "comentario": "..." },
+    { "nombre": "Reconocimiento del hallazgo clave", "cumple": "✓|⚠|✗", "comentario": "..." },
+    { "nombre": "Diagnóstico diferencial", "cumple": "✓|⚠|✗", "comentario": "..." },
+    { "nombre": "Decisión de derivación apropiada", "cumple": "✓|⚠|✗", "comentario": "..." },
+    { "nombre": "Evita el error crítico de corticoides", "cumple": "✓|⚠|✗", "comentario": "..." },
+    { "nombre": "Comunicación con el paciente", "cumple": "✓|⚠|✗", "comentario": "..." }
+  ],
+  "fortalezas": ["fortaleza 1", "fortaleza 2", "fortaleza 3"],
+  "mejoras": ["mejora 1", "mejora 2", "mejora 3"],
+  "pregunta_socratica": "Una pregunta que invite a reflexionar sobre un punto clave.",
+  "veredicto_global": "Una oración que resuma el desempeño con honestidad y respeto."
+}
+
+Tono: respetuoso, constructivo, honesto. Si el aprendiz prescribió corticoides, eso es un error crítico que hay que nombrar con claridad pero sin humillar. Si hizo bien algo difícil, reconocelo explícitamente.`;
+
+  try {
+    const raw = await callClaude(evalPrompt, 2000);
+    // Extraer JSON del texto
+    let jsonStr = extractText(raw).trim();
+    const fenceMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+    if (fenceMatch) jsonStr = fenceMatch[1].trim();
+    // Buscar primer { y último }
+    const first = jsonStr.indexOf('{');
+    const last = jsonStr.lastIndexOf('}');
+    if (first >= 0 && last > first) jsonStr = jsonStr.substring(first, last + 1);
+    const parsed = JSON.parse(jsonStr);
+    state.feedback = parsed;
+  } catch (e) {
+    state.feedback = { error: 'No se pudo procesar la evaluación: ' + (e.message || 'error desconocido') + '. Reintentá.' };
+  }
+  state.loading = false;
+  render();
+}
+
+// ---------------- NAVEGACIÓN ----------------
+function advance() {
+  const idx = PHASES.indexOf(state.phase);
+  if (idx < PHASES.length - 1) {
+    state.phase = PHASES[idx + 1];
+    render();
+  }
+}
+
+function restart() {
+  state.phase = 'intro';
+  state.anamnesis = [];
+  state.examChosen = {};
+  state.diagnosis = { principal: '', justificacion: '', alternativos: '' };
+  state.management = { urgencia: '', tratamientos: [], mensaje: '', razonamiento: '' };
+  state.feedback = null;
+  state.loading = false;
+  render();
+}
+
+function escapeHtml(s) {
+  if (s == null) return '';
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+// Llama a la función serverless /api/ask-claude (Vercel).
+// Devuelve el string de la respuesta del modelo (ya extraído).
+async function callClaude(prompt, maxTokens) {
+  const resp = await fetch('/api/ask-claude', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ prompt: String(prompt || ''), max_tokens: maxTokens || 1024 })
+  });
+  if (!resp.ok) {
+    let detail = '';
+    try { detail = (await resp.json()).error || ''; } catch (_) {}
+    throw new Error('Backend devolvió ' + resp.status + (detail ? ': ' + detail : ''));
+  }
+  const data = await resp.json();
+  return data.text || '';
+}
+
+// askClaude puede devolver string, objeto {text}, objeto {content},
+// o un array de bloques [{type,text},...]. Normalizamos a string.
+function extractText(reply) {
+  if (reply == null) return '';
+  if (typeof reply === 'string') return reply;
+  if (typeof reply === 'number' || typeof reply === 'boolean') return String(reply);
+  if (Array.isArray(reply)) {
+    return reply.map(item => {
+      if (typeof item === 'string') return item;
+      if (item && typeof item === 'object') return item.text || item.content || '';
+      return '';
+    }).join('');
+  }
+  if (typeof reply === 'object') {
+    if (typeof reply.text === 'string') return reply.text;
+    if (typeof reply.content === 'string') return reply.content;
+    if (Array.isArray(reply.content)) return extractText(reply.content);
+    if (typeof reply.message === 'string') return reply.message;
+    if (reply.message && typeof reply.message === 'object') return extractText(reply.message);
+    if (typeof reply.completion === 'string') return reply.completion;
+    if (typeof reply.output === 'string') return reply.output;
+    // Último recurso: serializar para no perder información
+    try { return JSON.stringify(reply); } catch (_) { return ''; }
+  }
+  return String(reply);
+}
+
+// Inicio
+render();
+</script>
+</body>
+</html>
